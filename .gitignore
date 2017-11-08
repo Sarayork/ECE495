@@ -1,0 +1,6 @@
+*.class
+*.iml
+*~
+.idea/
+out/
+workspace/.idea/*
