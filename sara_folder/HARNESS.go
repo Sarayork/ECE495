@@ -6,17 +6,28 @@ import(
   "net/http"
   "fmt"
   "github.com/gorilla/mux"
-  "io/ioutil"
-  "os"
+  //"io/ioutil"
+  //"os"
+  "html/template"
 
 )
 
 
 type Patient struct{
 
-  UID string `json: "id,omitempty"`
-  PatName string `json: "patname,omitempty"`
+  ID string `json: "id,omitempty"`
+  Name string `json: "patname,omitempty"`
+  Telecom string  `json: "telecom"`
+  Gender string `json: "gender"`
+  BirthDate string `json:"birthDate"`
 
+	Family string `json:"family, omitempty"`
+	Given string `json:"given"`
+	Prefix string `json:"prefix"`
+
+	System string `json:"system"`
+	Value string `json:"value"`
+	Use string `json:"use"`
 }
 //create array of patients that are type patient from the struct
 var Patients []Patient
@@ -25,11 +36,11 @@ var Patients []Patient
 func GetPatients(w http.ResponseWriter, req *http.Request){
 
   //LoadData()
-  
-  url := fmt.Sprintf("http://fhirtest.uhn.ca/baseDstu3/Patient/")
+
+  url := fmt.Sprintf("http://fhirtest.uhn.ca/baseDstu3/Patient")
   req, err := http.NewRequest("GET", url, nil)
   req.Header.Set("Content-Type", "application/json")
-  SaveData(Patients)
+  //SaveData(Patients)
   client := &http.Client{}
 
   //error control
@@ -46,47 +57,47 @@ func GetPatients(w http.ResponseWriter, req *http.Request){
   }
 
   //if ok defer the close of the Body
-  if resp.StatusCode == 200 {
-    defer resp.Body.Close()
-  }else {
-    fmt.Println("error")
-  }
+  defer resp.Body.Close()
+
 
   json.NewEncoder(w).Encode(Patients)
 
 }//end of GetPatients
-//load the data frim the fhir server
-
-func LoadData(){
-  file, err :=ioutil.ReadFile("PatientInfo.json")
-  if err != nil {
-    panic(err)
+//##############################################################
+//login for the user
+func UserLogin(w http.ResponseWriter, req *http.Request){
+  //params := mux.Vars(req)
+  //var person Patient
+  fmt.Println("method: ", req.Method)//get request Method
+  if req.Method == "GET" {
+    t, _ := template.ParseFiles("login.html")
+    t.Execute(w, nil)
+  } else {
+    req.ParseForm()
+    fmt.Println("User ID: ", req.Form["User ID"])
+    fmt.Println("Password: ", req.Form["Password"])
   }
-  json.Unmarshal([]byte(string(file)), &Patients)
+
+
+  _ = json.NewDecoder(req.Body).Decode(&Patients)
+
 }
+//###############################################
+func GetPatient(w http.ResponseWriter, r *http.Request){
 
-func SaveData(Data []Patient){
+  var ID string
 
-  str, err := json.Marshal(Data)
-
-  if err != nil {
-    fmt.Println("error")
-    return
+  fmt.Println("method: ", r.Method)
+  if r.Method == "GET"{
+    t, _ := template.ParseFiles("askForID.html")
+    t.Execute(w, nil)
   }
 
-  fo, err := os.Create("PatientInfo.json")
+  url := fmt.Sprintf("http://fhirtest.uhn.ca/baseDstu3/Patient" + ID)
 
-  if err != nil {
-    panic(err)
-  }
 
-  defer func(){
-    if err := fo.Close(); err != nil {
-      panic(err)
-    }
-  }()
-  fo.Write(str)
-}//save the Patients
+
+}
 
 func main(){
 //all the http handles are going to be in this already
@@ -95,8 +106,9 @@ func main(){
 //for the clients
 router := mux.NewRouter()
 
-LoadData()
 router.HandleFunc("/Patient", GetPatients).Methods("GET")
+router.HandleFunc("/log", UserLogin).Methods("GET")
+router.HandleFunc("/lkuID", GetPatient).Methods("GET")
 
 http.ListenAndServe(":9090", router)
 
