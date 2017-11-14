@@ -86,15 +86,40 @@ func UserLogin(w http.ResponseWriter, req *http.Request){
 func GetPatient(w http.ResponseWriter, r *http.Request){
 
   var ID string
+  var person Patient
 
   fmt.Println("method: ", r.Method)
   if r.Method == "GET"{
     t, _ := template.ParseFiles("askForID.html")
     t.Execute(w, nil)
+  } else {
+    r.ParseForm()
+    fmt.Println("ID: ", r.Form["ID"])
+    person.ID = r.FormValue("ID")
   }
 
   url := fmt.Sprintf("http://fhirtest.uhn.ca/baseDstu3/Patient" + ID)
+  r, err := http.NewRequest("GET", url, nil)
+  r.Header.Set("Content-Type", "application/json")
 
+  client := &http.Client{}
+
+  if err != nil{
+    log.Fatal("Do: ", err)
+    return
+  }
+
+  resp, err := client.Do(r)
+  if err != nil{
+    log.Fatal("Do: ", err)
+    return
+  }
+
+  if resp.StatusCode == 200 {
+    defer resp.Body.Close()
+  } else {
+    fmt.Println("Pateint not found")
+  }
 
 
 }
