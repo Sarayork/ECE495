@@ -32,7 +32,7 @@ type Patient struct{
 //create array of patients that are type patient from the struct
 var Patients []Patient
 
-//retrieve all the people function
+//retrieve all the people function//////////////////////////////////////////
 func GetPatients(w http.ResponseWriter, req *http.Request){
 
   //LoadData()
@@ -83,10 +83,12 @@ func UserLogin(w http.ResponseWriter, req *http.Request){
 
 }
 //###############################################
-func GetPatient(w http.ResponseWriter, r *http.Request){
+func GetPatientByID(w http.ResponseWriter, r *http.Request){
 
-  var ID string
+  //var ID string
   var person Patient
+
+  _ = json.NewDecoder(r.Body).Decode(&person)
 
   fmt.Println("method: ", r.Method)
   if r.Method == "GET"{
@@ -98,32 +100,73 @@ func GetPatient(w http.ResponseWriter, r *http.Request){
     person.ID = r.FormValue("ID")
   }
 
-  url := fmt.Sprintf("http://fhirtest.uhn.ca/baseDstu3/Patient" + ID)
+  url := fmt.Sprintf("http://fhirtest.uhn.ca/baseDstu3/Patient" + person.ID)
   r, err := http.NewRequest("GET", url, nil)
   r.Header.Set("Content-Type", "application/json")
 
   client := &http.Client{}
 
-  if err != nil{
-    log.Fatal("Do: ", err)
-    return
-  }
+  resp := client.Do(r)
+  defer resp.Body.Close()
 
-  resp, err := client.Do(r)
-  if err != nil{
-    log.Fatal("Do: ", err)
-    return
-  }
+  json.NewEncoder(w).Encode(Patients)
 
-  if resp.StatusCode == 200 {
-    defer resp.Body.Close()
+}//end of look up by ID
+/////////////////////////////////////////////////////////////////////////
+func GetPatientByName(w http.ResponseWriter, r *http.Request){
+  //var Name string
+  var person Patient
+
+  _ = json.NewDecoder(r.Body).Decode(&person)
+
+  fmt.Println("method: ", r.Method)
+  if r.Method == "GET"{
+    t, _ := template.ParseFiles("askForName.html")
+    t.Execute(w, nil)
   } else {
-    fmt.Println("Pateint not found")
+    r.ParseForm()
+    fmt.Println("Patient: ", r.Form["Patient"])
+    person.Name = r.FormValue("Patient")
   }
+
+  url := fmt.Sprintf("http://fhirtest.uhn.ca/baseDstu3/Patient" + person.Name)
+  r, err := http.NewRequest("GET", url, nil)
+  r.Header.Set("Content-Type", "application/json")
+
+  client := &http.Client{}
+  resp := client.Do(r)
+  defer resp.Body.Close()
+
+  json.NewEncoder(w).Encode(Patients)
+
+}
+////////////////////////////////////////////////////////////////////////////
+func GetMedication(w http.ResponseWriter, r *http.Request){
+
+  var person Patient
+  var medicationID string
+
+  fmt.Println("method: ", r.Method)
+  if r.Method == "GET"{
+    t, _ := template.ParseFiles("Medication.html")
+    t.Execute(w, nil)
+  } else {
+    r.ParseForm()
+    fmt.Println("Medication: ", r.Form["Medication"])
+    medicationID = r.FormValue("Medication")
+  }
+
+  url := fmt.Sprintf("http://fhirtest.uhn.ca/baseDstu3/Medication" + medicationID)
+  r, err := http.NewRequest("GET", url, nil)
+  r.Header.Set("Content-Type", "application/json")
+
+  client := &http.Client{}
+
+  resp := client.Do(r)
+  defer resp.Body.Close()
 
 
 }
-
 func main(){
 //all the http handles are going to be in this already
 //also run the main menu for the client on a webpage
@@ -133,7 +176,9 @@ router := mux.NewRouter()
 
 router.HandleFunc("/Patient", GetPatients).Methods("GET")
 router.HandleFunc("/log", UserLogin).Methods("GET")
-router.HandleFunc("/lkuID", GetPatient).Methods("GET")
+router.HandleFunc("/lkuID", GetPatientByID).Methods("GET")
+router.HandleFunc("/lku", GetPatientByName).Methods("GET")
+router.HandleFunc("/med", GetMedication).Methods("GET")
 
 http.ListenAndServe(":9090", router)
 
