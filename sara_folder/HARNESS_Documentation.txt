@@ -1,0 +1,92 @@
+Documentation for the HARNESS server:
+
+Purpose: create a 'social media' server to help a user manage their health care records
+
+HARNESS.go runs in web browser as localhost:9090/
+	depending on which function you are trying to access you add the proper url tag after the '/'
+
+Function list and url tag:
+GetPatients: Patient
+UserLogin: log
+CreatePatient: create
+GetPatientByID: lkuID
+GetPatientByName: lku
+GetMedication: med
+GetCondition: cond
+GetEncounter: enc
+RemoveContact: rmc
+AddContact: add
+
+type Patient struct: 
+	this is the basic stucture for the information of the patient. 
+	
+GetPatients:
+	url: /Patient
+		
+	this function is intended to retrieve all patient records from the FHIR server. 
+	currently it doesn't display all of them on the web browser
+	
+	
+UserLogin: 
+	url: /log
+	
+	displays a login webpage for the user
+	not a transition into a main successful login page or registration
+	
+	ideas: 
+		1. check list of registered users
+		2. if they dont exist go to CreatePatient function
+		3. else accept login
+	
+GetPatientByID:
+	url: /lkuID
+	
+	search for someones IP by searching by ID
+	
+CreatePatient:
+	url: /create
+	
+	if user does not exist in server they must create login information
+	they provide: 
+		firstname
+		lastname
+		telephone
+		email
+		role(doctor, patient, pharmacist, etc)
+	server returns a generated User ID for them to use
+	the information is stored locally in PatientInfo.json
+	
+GetPatientByName:
+	url: /lku
+	
+	user can search for another user by common name
+	
+GetCondition:
+	url: /cond
+	
+	user can type in patient ID and retrieve the records that have all listed conditions
+	record is saved locally
+	
+GetMedication: 
+	url: /med
+	
+	user can type in patient ID and retrieve records the have all medications for the searched patient
+	record is saved locally 
+	
+GetEncounter:
+	url: /enc
+	
+	user can search by Patient ID and retrieve all encounters
+	the record is saved locally
+	
+RemoveContact:
+	url: /rmc
+	
+	the user can remove contacts 
+
+AddContact:
+	url: /add
+	
+	user can add contacts
+	
+	
