@@ -1,0 +1,11 @@
+{
+  "name": "HArNESS REST server",
+  "version": "0.1.0",
+  "description": "apiDoc for HArNESS REST server",
+  "order": [
+  	"User",
+  	"Invitation",
+  	"Friendship",
+  	"Notification"
+  ]
+}
