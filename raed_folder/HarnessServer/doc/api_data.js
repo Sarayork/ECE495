@@ -1,4 +1,4 @@
-[
+define({ "api": [
   {
     "type": "delete",
     "url": "/invitation/:srcUid/:destUid/:srcRole/:destRole",
@@ -41,7 +41,7 @@
         ]
       }
     },
-    "filename": "./HarnessServer.go",
+    "filename": "./api.go",
     "groupTitle": "Invitation",
     "error": {
       "fields": {
@@ -49,7 +49,7 @@
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UidNotFoundError",
+            "field": "UidNotFound",
             "description": "<p>The <code>uid</code> is not found</p>"
           }
         ]
@@ -57,7 +57,7 @@
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFoundError\"\n}",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
           "type": "json"
         }
       ]
@@ -99,12 +99,12 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"invitations\": [\n   \t{\n  \t \t\"src\": \"556171\",\n  \t \t\"role\": {\n  \t \t\t\"srcRole\": \"doctor\",\n  \t \t\t\"destRole\": \"patient\"\n  \t \t}\n     },\n   \t{\n  \t \t\"src\": \"17117\",\n  \t \t\"role\": {\n  \t \t\t\"srcRole\": \"pharmacist\",\n  \t \t\t\"destRole\": \"patient\"\n  \t \t}\n     }        \n  }\n}",
+          "content": "HTTP/1.1 200 OK\n{\n  \"invitations\": [\n   \t{\n  \t \t\"src\": \"556171\",\n  \t \t\"role\": {\n  \t \t\t\"srcRole\": \"doctor\",\n  \t \t\t\"destRole\": \"patient\"\n  \t \t}\n     },\n   \t{\n  \t \t\"src\": \"17117\",\n  \t \t\"role\": {\n  \t \t\t\"srcRole\": \"pharmacist\",\n  \t \t\t\"destRole\": \"patient\"\n  \t \t}\n     }\n  }\n}",
           "type": "json"
         }
       ]
     },
-    "filename": "./HarnessServer.go",
+    "filename": "./api.go",
     "groupTitle": "Invitation",
     "error": {
       "fields": {
@@ -112,7 +112,7 @@
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UidNotFoundError",
+            "field": "UidNotFound",
             "description": "<p>The <code>uid</code> is not found</p>"
           }
         ]
@@ -120,7 +120,7 @@
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFoundError\"\n}",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
           "type": "json"
         }
       ]
@@ -128,7 +128,7 @@
   },
   {
     "type": "post",
-    "url": "/addInvitation",
+    "url": "/invitation/:srcUid/:destUid/:srcRole/:destRole",
     "title": "Add invitation",
     "name": "PostInvitation",
     "group": "Invitation",
@@ -202,7 +202,7 @@
         }
       ]
     },
-    "filename": "./HarnessServer.go",
+    "filename": "./api.go",
     "groupTitle": "Invitation",
     "error": {
       "fields": {
@@ -210,7 +210,7 @@
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UidNotFoundError",
+            "field": "UidNotFound",
             "description": "<p>The <code>uid</code> is not found</p>"
           }
         ]
@@ -218,7 +218,7 @@
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFoundError\"\n}",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
           "type": "json"
         }
       ]
@@ -260,12 +260,12 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"notifications\": [\n   \t{\n  \t \t\"src\": \"556171\",\n    \t \t\"dateTime\": \"2017-11-19 17:15:45\"\n     },\n   \t{\n  \t \t\"src\": \"17117\",\n    \t \t\"dateTime\": \"2017-11-20 8:34:22\"\n     },\n   \t{\n  \t \t\"src\": \"364346\",\n    \t \t\"dateTime\": \"2017-11-20 11:55:53\"\n     }          \n  ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n  \"notifications\": [\n   \t{\n  \t \t\"src\": \"556171\",\n    \t \t\"dateTime\": \"2017-11-19 17:15:45\"\n     },\n   \t{\n  \t \t\"src\": \"17117\",\n    \t \t\"dateTime\": \"2017-11-20 8:34:22\"\n     },\n   \t{\n  \t \t\"src\": \"364346\",\n    \t \t\"dateTime\": \"2017-11-20 11:55:53\"\n     }\n  ]\n}",
           "type": "json"
         }
       ]
     },
-    "filename": "./HarnessServer.go",
+    "filename": "./api.go",
     "groupTitle": "Notification",
     "error": {
       "fields": {
@@ -273,7 +273,7 @@
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UidNotFoundError",
+            "field": "UidNotFound",
             "description": "<p>The <code>uid</code> is not found</p>"
           }
         ]
@@ -281,7 +281,7 @@
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFoundError\"\n}",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
           "type": "json"
         }
       ]
@@ -349,7 +349,7 @@
         }
       ]
     },
-    "filename": "./HarnessServer.go",
+    "filename": "./api.go",
     "groupTitle": "Notification",
     "error": {
       "fields": {
@@ -357,7 +357,7 @@
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UidNotFoundError",
+            "field": "UidNotFound",
             "description": "<p>The <code>uid</code> is not found</p>"
           }
         ]
@@ -365,7 +365,7 @@
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFoundError\"\n}",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
           "type": "json"
         }
       ]
@@ -373,13 +373,20 @@
   },
   {
     "type": "put",
-    "url": "/beatHeart/:uid",
+    "url": "/beatHeart/:uid/",
     "title": "Beat Heart",
     "name": "BeatHeart",
     "group": "User",
     "version": "0.1.0",
     "description": "<p>Update the current IP address of the user</p>",
     "parameter": {
+      "examples": [
+        {
+          "title": "The body of the request is in json format. Example:",
+          "content": "{\n \"currentip\": \"10.1.2.3\"\n}",
+          "type": "json"
+        }
+      ],
       "fields": {
         "Parameter": [
           {
@@ -388,13 +395,6 @@
             "optional": false,
             "field": "uid",
             "description": "<p>User's id</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "currentIp",
-            "description": "<p>User's current IP address</p>"
           }
         ]
       }
@@ -408,7 +408,7 @@
         }
       ]
     },
-    "filename": "./HarnessServer.go",
+    "filename": "./api.go",
     "groupTitle": "User",
     "error": {
       "fields": {
@@ -416,7 +416,7 @@
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UidNotFoundError",
+            "field": "UidNotFound",
             "description": "<p>The <code>uid</code> is not found</p>"
           }
         ]
@@ -424,7 +424,7 @@
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFoundError\"\n}",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
           "type": "json"
         }
       ]
@@ -432,12 +432,12 @@
   },
   {
     "type": "get",
-    "url": "/user/:name",
+    "url": "/user/getUid/:name",
     "title": "Look up uid",
     "name": "GetUserByName",
     "group": "User",
     "version": "0.1.0",
-    "description": "<p>Get <code>uid</code> of the user with given <code>name</code>. If not found, return a UidNotFoundError</p>",
+    "description": "<p>Get <code>uid</code> of the user with given <code>name</code>. If not found, return a UserNameNotFoundError</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -466,12 +466,12 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"uid\": \"12461\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n  [{\"uid\": \"12461\"}]\n}",
           "type": "json"
         }
       ]
     },
-    "filename": "./HarnessServer.go",
+    "filename": "./api.go",
     "groupTitle": "User",
     "error": {
       "fields": {
@@ -479,15 +479,15 @@
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UidNotFoundError",
-            "description": "<p>The <code>uid</code> is not found</p>"
+            "field": "UerNameNotFound",
+            "description": "<p>The <code>name</code> is not found</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFoundError\"\n}",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UerNameNotFound\"\n}",
           "type": "json"
         }
       ]
@@ -495,7 +495,7 @@
   },
   {
     "type": "get",
-    "url": "/user/:uid",
+    "url": "/user/getIp/:uid",
     "title": "Look up ip",
     "name": "GetUserIpByUid",
     "group": "User",
@@ -534,7 +534,7 @@
         }
       ]
     },
-    "filename": "./HarnessServer.go",
+    "filename": "./api.go",
     "groupTitle": "User",
     "error": {
       "fields": {
@@ -542,7 +542,7 @@
           {
             "group": "Error 4xx",
             "optional": false,
-            "field": "UidNotFoundError",
+            "field": "UidNotFound",
             "description": "<p>The <code>uid</code> is not found</p>"
           }
         ]
@@ -550,7 +550,7 @@
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFoundError\"\n}",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
           "type": "json"
         }
       ]
@@ -565,66 +565,13 @@
     "version": "0.1.0",
     "description": "<p>Generate unique Users-ID and add new user account in the HArNESS data base</p>",
     "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "name",
-            "description": "<p>User's name</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "password",
-            "description": "<p>User's password</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "email",
-            "description": "<p>User's email</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "address",
-            "description": "<p>User's address</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "phoneNumber",
-            "description": "<p>User's phoneNumber</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "roles",
-            "description": "<p>User's roles</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "timestamp",
-            "description": "<p>User's timestamp</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "currentIp",
-            "description": "<p>User's currentIp</p>"
-          }
-        ]
-      }
+      "examples": [
+        {
+          "title": "The body of the request is in json format. Example:",
+          "content": "{\n\t\"uid\": \"\",\n \"fhirid\": \"191021\",\n\t\"name\": \"Jane\",\n\t\"password\": \"ac65c0f32e6a9083b6a3f8dc8badd576\",\n\t\"email\": \"name@example.com\",\n\t\"address\": \"Geneva\",\n\t\"phoneNumber\": \"004125466321\",\n\t\"roles\": [\"patient\", \"doctor\"],\n\t\"timestamp\": \"3600\",\n\t\"currentip\": \"\"\n}",
+          "type": "json"
+        }
+      ]
     },
     "success": {
       "fields": {
@@ -646,7 +593,7 @@
         }
       ]
     },
-    "filename": "./HarnessServer.go",
+    "filename": "./api.go",
     "groupTitle": "User",
     "error": {
       "fields": {
@@ -667,5 +614,33 @@
         }
       ]
     }
+  },
+  {
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "optional": false,
+            "field": "varname1",
+            "description": "<p>No type.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "varname2",
+            "description": "<p>With type.</p>"
+          }
+        ]
+      }
+    },
+    "type": "",
+    "url": "",
+    "version": "0.0.0",
+    "filename": "./doc/main.js",
+    "group": "_home_raed_go_src_ECE495_raed_folder_HarnessServer_doc_main_js",
+    "groupTitle": "_home_raed_go_src_ECE495_raed_folder_HarnessServer_doc_main_js",
+    "name": ""
   }
-]
+] });

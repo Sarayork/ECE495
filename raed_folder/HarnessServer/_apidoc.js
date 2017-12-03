@@ -14,11 +14,22 @@
 
 /** 
  * @apiDefine UidNotFoundError
- * @apiError (Error 4xx) UidNotFoundError The <code>uid</code> is not found
+ * @apiError (Error 4xx) UidNotFound The <code>uid</code> is not found
  *
  * @apiErrorExample Error-Response:
  *     HTTP/1.1 404 Not Found
  *     {
- *       "error": "UidNotFoundError"
+ *       "error": "UidNotFound"
+ *     }
+ */
+
+/** 
+ * @apiDefine UserNameNotFoundError
+ * @apiError (Error 4xx) UerNameNotFound The <code>name</code> is not found
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *       "error": "UerNameNotFound"
  *     }
  */
