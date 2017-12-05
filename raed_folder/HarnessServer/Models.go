@@ -14,3 +14,12 @@ type User struct{
 	Timestamp   string    `json:"timestamp"`
 	CurrentIp   string    `json:"currentIp"`
 }
+
+type Relation struct {
+	Id       bson.ObjectId `bson:"_id,omitempty" json:"id"`
+	SrcUid   string `bson:"srcuid,omitempty" json:"srcuid"`
+	DestUid  string `bson:"destuid,omitempty" json:"destuid"`
+	SrcRole  string `bson:"srcrole,omitempty" json:"srcrole"`
+	DestRole string `bson:"destrole,omitempty" json:"destrole"`
+	Status   string `bson:"status" json:"status"`
+}

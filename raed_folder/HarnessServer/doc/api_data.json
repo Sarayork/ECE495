@@ -1,230 +1,5 @@
 [
   {
-    "type": "delete",
-    "url": "/invitation/:srcUid/:destUid/:srcRole/:destRole",
-    "title": "Remove invitation",
-    "name": "DeleteInvitation",
-    "group": "Invitation",
-    "version": "0.1.0",
-    "description": "<p>Remove relation. If the <code>srcUid</code> or <code>destUid</code> do not exist, return UidNotFoundError</p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "srcUid",
-            "description": "<p>Sender user id</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "destUid",
-            "description": "<p>Destination user id</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "srcRole",
-            "description": "<p>Sender user role</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "destRole",
-            "description": "<p>Destination user role</p>"
-          }
-        ]
-      }
-    },
-    "filename": "./api.go",
-    "groupTitle": "Invitation",
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "UidNotFound",
-            "description": "<p>The <code>uid</code> is not found</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
-          "type": "json"
-        }
-      ]
-    }
-  },
-  {
-    "type": "get",
-    "url": "/invitations/:uid",
-    "title": "Look up invitations",
-    "name": "GetReceivedInvitations",
-    "group": "Invitation",
-    "version": "0.1.0",
-    "description": "<p>Get all pending invitation. If the <code>uid</code> do not exist, return UidNotFoundError</p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "uid",
-            "description": "<p>Destination user's id</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Relation",
-            "optional": false,
-            "field": "invitations",
-            "description": "<p>List of the received invitation</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"invitations\": [\n   \t{\n  \t \t\"src\": \"556171\",\n  \t \t\"role\": {\n  \t \t\t\"srcRole\": \"doctor\",\n  \t \t\t\"destRole\": \"patient\"\n  \t \t}\n     },\n   \t{\n  \t \t\"src\": \"17117\",\n  \t \t\"role\": {\n  \t \t\t\"srcRole\": \"pharmacist\",\n  \t \t\t\"destRole\": \"patient\"\n  \t \t}\n     }\n  }\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./api.go",
-    "groupTitle": "Invitation",
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "UidNotFound",
-            "description": "<p>The <code>uid</code> is not found</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
-          "type": "json"
-        }
-      ]
-    }
-  },
-  {
-    "type": "post",
-    "url": "/invitation/:srcUid/:destUid/:srcRole/:destRole",
-    "title": "Add invitation",
-    "name": "PostInvitation",
-    "group": "Invitation",
-    "version": "0.1.0",
-    "description": "<p>Add new invitation. If the <code>srcUid</code> or <code>destUid</code> do not exist, return UidNotFoundError</p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "srcUid",
-            "description": "<p>Sender user id</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "destUid",
-            "description": "<p>destination user id</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "srcRole",
-            "description": "<p>Sender role</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "destRole",
-            "description": "<p>destination role</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "string",
-            "optional": false,
-            "field": "src",
-            "description": "<p>Sender user id</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "string",
-            "optional": false,
-            "field": "dest",
-            "description": "<p>Target user id</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "string",
-            "optional": false,
-            "field": "status",
-            "description": "<p>Invitation status</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "HTTP/1.1 201 Created",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "./api.go",
-    "groupTitle": "Invitation",
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "UidNotFound",
-            "description": "<p>The <code>uid</code> is not found</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Error-Response:",
-          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
-          "type": "json"
-        }
-      ]
-    }
-  },
-  {
     "type": "get",
     "url": "/notifications/:uid",
     "title": "Look up notifications",
@@ -351,6 +126,279 @@
     },
     "filename": "./api.go",
     "groupTitle": "Notification",
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UidNotFound",
+            "description": "<p>The <code>uid</code> is not found</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "delete",
+    "url": "/relation/:srcUid/:destUid/:srcRole/:destRole",
+    "title": "Remove relation",
+    "name": "DeleteRelation",
+    "group": "Relation",
+    "version": "0.1.0",
+    "description": "<p>Remove relation. If the <code>srcUid</code> or <code>destUid</code> do not exist, return UidNotFoundError</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "srcUid",
+            "description": "<p>Sender user id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "destUid",
+            "description": "<p>Destination user id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "srcRole",
+            "description": "<p>Sender user role</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "destRole",
+            "description": "<p>Destination user role</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./api.go",
+    "groupTitle": "Relation",
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UidNotFound",
+            "description": "<p>The <code>uid</code> is not found</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "get",
+    "url": "/invitations/:uid",
+    "title": "Look up invitations",
+    "name": "GetPendingRelations",
+    "group": "Relation",
+    "version": "0.1.0",
+    "description": "<p>Get all pending relations. If the <code>uid</code> do not exist, return UidNotFoundError</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "uid",
+            "description": "<p>Destination user's id</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Relation",
+            "optional": false,
+            "field": "invitations",
+            "description": "<p>List of the relations with status &quot;pending&quot;</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n  \"invitations\": [\n   \t{\n  \t \t\"src\": \"556171\",\n  \t \t\"roles\": {\n  \t \t\t\"srcRole\": \"doctor\",\n  \t \t\t\"destRole\": \"patient\"\n  \t \t}\n     },\n   \t{\n  \t \t\"src\": \"17117\",\n  \t \t\"roles\": {\n  \t \t\t\"srcRole\": \"pharmacist\",\n  \t \t\t\"destRole\": \"patient\"\n  \t \t}\n     }\n  }\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./api.go",
+    "groupTitle": "Relation",
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UidNotFound",
+            "description": "<p>The <code>uid</code> is not found</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "post",
+    "url": "/relation/:srcUid/:destUid/:srcRole/:destRole",
+    "title": "Add relation",
+    "name": "PostRelation",
+    "group": "Relation",
+    "version": "0.1.0",
+    "description": "<p>Add new relation with status &quot;pending&quot;. If the <code>srcUid</code> or <code>destUid</code> do not exist, return UidNotFoundError</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "srcUid",
+            "description": "<p>Sender user id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "destUid",
+            "description": "<p>destination user id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "srcRole",
+            "description": "<p>Sender role</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "destRole",
+            "description": "<p>destination role</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 201 Created",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./api.go",
+    "groupTitle": "Relation",
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "UidNotFound",
+            "description": "<p>The <code>uid</code> is not found</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 404 Not Found\n{\n  \"error\": \"UidNotFound\"\n}",
+          "type": "json"
+        }
+      ]
+    }
+  },
+  {
+    "type": "put",
+    "url": "/relation/:srcUid/:destUid/:srcRole/:destRole",
+    "title": "Accept relation",
+    "name": "PutRelation",
+    "group": "Relation",
+    "version": "0.1.0",
+    "description": "<p>Change the relation status to &quot;accepted&quot;. If the <code>srcUid</code> or <code>destUid</code> do not exist, return UidNotFoundError</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "srcUid",
+            "description": "<p>Sender user id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "destUid",
+            "description": "<p>Destination user id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "srcRole",
+            "description": "<p>Sender user role</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "destRole",
+            "description": "<p>Destination user role</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 Ok",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "./api.go",
+    "groupTitle": "Relation",
     "error": {
       "fields": {
         "Error 4xx": [

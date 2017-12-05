@@ -7,9 +7,8 @@ import (
 	"encoding/json"
 	"gopkg.in/mgo.v2/bson"
 	"goji.io/pat"
+	"fmt"
 )
-
-const DBNAME = "harness"
 
 /**
  * @api {post} /user Subscribe a new user
@@ -57,7 +56,7 @@ func subscribe(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
 		}
 		user.Uid = bson.NewObjectId()
 
-		c := session.DB(DBNAME).C("users")
+		c := session.DB(DBNAME).C(USERSCOLL)
 
 		err = c.Insert(user)
 		if err != nil {
@@ -177,7 +176,7 @@ func lookUpUid(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
 
 		userName := pat.Param(r, "name")
 
-		c := session.DB(DBNAME).C("users")
+		c := session.DB(DBNAME).C(USERSCOLL)
 
 		var usersList []User
 		err := c.Find(bson.M{"name": userName}).All(&usersList)
@@ -192,13 +191,13 @@ func lookUpUid(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		type returnedStruct struct {
+		type ReturnedStruct struct {
 			Uid string `json:"uid"`
 		}
 
-		var uidList []returnedStruct
+		var uidList []ReturnedStruct
 		for _, u := range usersList {
-			uidList = append(uidList, returnedStruct{ u.Uid.Hex()})
+			uidList = append(uidList, ReturnedStruct{ u.Uid.Hex()})
 		}
 
 		respBody, err := json.MarshalIndent(uidList, "", "  ")
@@ -240,7 +239,7 @@ func lookUpIp(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
 
 		_, user := checkForUid(session, userId, w)
 		if user.Uid == "" {
-			return 
+			return
 		}
 
 		respBody, err := json.MarshalIndent(struct {
@@ -255,12 +254,12 @@ func lookUpIp(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
 }
 
 /**
- * @api {post} /invitation/:srcUid/:destUid/:srcRole/:destRole Add invitation
- * @apiName PostInvitation
- * @apiGroup Invitation
+ * @api {post} /relation/:srcUid/:destUid/:srcRole/:destRole Add relation
+ * @apiName PostRelation
+ * @apiGroup Relation
  * @apiVersion 0.1.0
  *
- * @apiDescription Add new invitation. If the <code>srcUid</code> or <code>destUid</code>
+ * @apiDescription Add new relation with status "pending". If the <code>srcUid</code> or <code>destUid</code>
  * do not exist, return UidNotFoundError
  *
  * @apiParam {string} srcUid Sender user id
@@ -268,43 +267,83 @@ func lookUpIp(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
  * @apiParam {string} srcRole Sender role
  * @apiParam {string} destRole destination role
  *
- * @apiSuccess {string} src Sender user id
- * @apiSuccess {string} dest Target user id
- * @apiSuccess {string} status Invitation status
- *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 201 Created
  *
  * @apiUse UidNotFoundError
  */
-func addInvitation(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
+func addRelation(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session := s.Copy()
 		defer session.Close()
 
-		//srcUid := pat.Param(r, "srcUid")
-		//destUid := pat.Param(r, "destUid")
-		//srcRole := pat.Param(r, "srcRole")
-		//destRole := pat.Param(r, "destRole")
-		//
-		//c, user := checkForUid(session, srcUid, w)
-		//
-		//c := session.DB(DBNAME).C("relations")
+		srcUid := pat.Param(r, "srcUid")
+		destUid := pat.Param(r, "destUid")
+		srcRole := pat.Param(r, "srcRole")
+		destRole := pat.Param(r, "destRole")
+
+		_, srcUser := checkForUid(session, srcUid, w)
+		if srcUser.Uid == "" {
+			return
+		}
+		_, destUser := checkForUid(session, destUid, w)
+		if destUser.Uid == "" {
+			return
+		}
+		if !userHaveRole(srcUser, srcRole) {
+			ErrorWithJSON(w, "RoleNotFound", http.StatusNotFound)
+			return
+		}
+		if !userHaveRole(destUser, destRole) {
+			ErrorWithJSON(w, "RoleNotFound", http.StatusNotFound)
+			return
+		}
+
+		c := session.DB(DBNAME).C(RELATIONSCOLL)
+		var invitations []Relation
+		err := c.Find(bson.M{
+			"srcuid": srcUid,
+			"destuid": destUid,
+			"srcrole": srcRole,
+			"destrole": destRole}).All(&invitations)
+		if err != nil {
+			ErrorWithJSON(w, "Database error", http.StatusInternalServerError)
+			log.Println("Failed find invitations: ", err)
+			return
+		}
+		if len(invitations) != 0 {
+			ErrorWithJSON(w, "RelationAlreadyExist", http.StatusBadRequest)
+			return
+		}
+
+		relation := Relation{
+			SrcUid: srcUid,
+			DestUid: destUid,
+			SrcRole: srcRole,
+			DestRole: destRole,
+			Status: "pending",
+		}
+		err = c.Insert(relation)
+		if err != nil {
+			ErrorWithJSON(w, "Database error", http.StatusInternalServerError)
+			log.Println("Failed relation user: ", err)
+			return
+		}
 	}
 }
 
 /**
  * @api {get} /invitations/:uid Look up invitations
- * @apiName GetReceivedInvitations
- * @apiGroup Invitation
+ * @apiName GetPendingRelations
+ * @apiGroup Relation
  * @apiVersion 0.1.0
  *
- * @apiDescription Get all pending invitation. If the <code>uid</code>
+ * @apiDescription Get all pending relations. If the <code>uid</code>
  * do not exist, return UidNotFoundError
  *
  * @apiParam {string} uid Destination user's id
  *
- * @apiSuccess {Relation} invitations List of the received invitation
+ * @apiSuccess {Relation} invitations List of the relations with status "pending"
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
@@ -312,14 +351,14 @@ func addInvitation(s *mgo.Session) func(w http.ResponseWriter, req *http.Request
  *       "invitations": [
  *        	{
  *       	 	"src": "556171",
- *       	 	"role": {
+ *       	 	"roles": {
  *       	 		"srcRole": "doctor",
  *       	 		"destRole": "patient"
  *       	 	}
  *          },
  *        	{
  *       	 	"src": "17117",
- *       	 	"role": {
+ *       	 	"roles": {
  *       	 		"srcRole": "pharmacist",
  *       	 		"destRole": "patient"
  *       	 	}
@@ -330,13 +369,135 @@ func addInvitation(s *mgo.Session) func(w http.ResponseWriter, req *http.Request
  * @apiUse UidNotFoundError
  */
 func lookUpInvitations(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {}
+	return func(w http.ResponseWriter, r *http.Request) {
+		session := s.Copy()
+		defer session.Close()
+
+		destUid := pat.Param(r, "uid")
+
+		_, user := checkForUid(session, destUid, w)
+		if user.Uid == "" {
+			return
+		}
+
+		c := session.DB(DBNAME).C(RELATIONSCOLL)
+
+		var invitations []Relation
+		err := c.Find(bson.M{"destuid": destUid, "status": "pending"}).All(&invitations)
+		if err != nil {
+			ErrorWithJSON(w, "Database error", http.StatusInternalServerError)
+			log.Println("Failed find invitations: ", err)
+			return
+		}
+
+		type Roles struct {
+			SrcRole string `json:"srcRole"`
+			DestRole string `json:"destRole"`
+		}
+		type ReturnedStruct struct {
+			Src string `json:"src"`
+			Roles Roles `json:"roles"`
+		}
+
+		var invitationsList []ReturnedStruct
+
+		for _, i := range invitations {
+			invitationsList = append(invitationsList,
+				ReturnedStruct{
+					Src: i.SrcUid,
+					Roles: Roles{
+						SrcRole: i.SrcRole,
+						DestRole: i.DestRole,
+					},
+				})
+		}
+
+		respBody, err := json.MarshalIndent(invitationsList, "", "  ")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		ResponseWithJSON(w, respBody, http.StatusOK)
+	}
 }
 
 /**
- * @api {delete} /invitation/:srcUid/:destUid/:srcRole/:destRole Remove invitation
- * @apiName DeleteInvitation
- * @apiGroup Invitation
+ * @api {put} /relation/:srcUid/:destUid/:srcRole/:destRole Accept relation
+ * @apiName PutRelation
+ * @apiGroup Relation
+ * @apiVersion 0.1.0
+ *
+ * @apiDescription Change the relation status to "accepted". If the <code>srcUid</code> or <code>destUid</code>
+ * do not exist, return UidNotFoundError
+ *
+ * @apiParam {string} srcUid Sender user id
+ * @apiParam {string} destUid Destination user id
+ * @apiParam {string} srcRole Sender user role
+ * @apiParam {string} destRole Destination user role
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 Ok
+ *
+ *
+ * @apiUse UidNotFoundError
+ */
+func acceptRelation(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session := s.Copy()
+		defer session.Close()
+
+		srcUid := pat.Param(r, "srcUid")
+		destUid := pat.Param(r, "destUid")
+		srcRole := pat.Param(r, "srcRole")
+		destRole := pat.Param(r, "destRole")
+
+		c := session.DB(DBNAME).C(RELATIONSCOLL)
+
+		var relation Relation
+		err := c.Find(bson.M{
+			"srcuid": srcUid,
+			"destuid": destUid,
+			"srcrole": srcRole,
+			"destrole": destRole,
+			"status": "pedding",
+			}).One(&relation)
+
+		if err != nil {
+			switch err {
+			default:
+				ErrorWithJSON(w, "Database error", http.StatusInternalServerError)
+				log.Println("Failed update relation: ", err)
+				return
+			case mgo.ErrNotFound:
+				ErrorWithJSON(w, "relation not found", http.StatusNotFound)
+				return
+			}
+		}
+
+		relation.Status = "accepted"
+		fmt.Println(relation.Id)
+
+		err = c.Update(bson.M{"_id": relation.Id}, &relation)
+		if err != nil {
+			switch err {
+			default:
+				ErrorWithJSON(w, "Database error", http.StatusInternalServerError)
+				log.Println("Failed update relation: ", err)
+				return
+			case mgo.ErrNotFound:
+				ErrorWithJSON(w, "relation not found", http.StatusNotFound)
+				return
+			}
+		}
+
+		ResponseWithNoContent(w, http.StatusOK)
+	}
+}
+
+/**
+ * @api {delete} /relation/:srcUid/:destUid/:srcRole/:destRole Remove relation
+ * @apiName DeleteRelation
+ * @apiGroup Relation
  * @apiVersion 0.1.0
  *
  * @apiDescription Remove relation. If the <code>srcUid</code> or <code>destUid</code>
@@ -349,7 +510,7 @@ func lookUpInvitations(s *mgo.Session) func(w http.ResponseWriter, req *http.Req
  *
  * @apiUse UidNotFoundError
  */
-func removeInvitation(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
+func removeRelation(s *mgo.Session) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {}
 }
 
@@ -416,17 +577,15 @@ func lookUpMsgNotif(s *mgo.Session) func(w http.ResponseWriter, req *http.Reques
 	return func(w http.ResponseWriter, r *http.Request) {}
 }
 
-
-
 /**
-	Check if the uid exist. If so, returns the corresponding user and mgo.Collection
+	Check if the uid exist. If so, returns the corresponding user struct and mgo.Collection for user
  */
 func checkForUid(session *mgo.Session, userId string, w http.ResponseWriter) (c *mgo.Collection, user User) {
 	if len(userId) != 24 {
 		ErrorWithJSON(w, "Error in uid format. Lenght must be 24", http.StatusNotFound)
 		return
 	}
-	c = session.DB(DBNAME).C("users")
+	c = session.DB(DBNAME).C(USERSCOLL)
 	err1 := c.FindId(bson.ObjectIdHex(userId)).One(&user)
 	if err1 != nil {
 		switch err1 {
@@ -439,5 +598,19 @@ func checkForUid(session *mgo.Session, userId string, w http.ResponseWriter) (c 
 			return
 		}
 	}
+	return
+}
+
+/**
+	Check if the role is in the given list of roles. If so, returns true
+ */
+func userHaveRole(user User, role string) (b bool){
+	b = true
+	for _, e := range user.Roles {
+		if e == role {
+			return
+		}
+	}
+	b = false
 	return
 }
